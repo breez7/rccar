@@ -4,15 +4,13 @@ import sys
 import syslog
 
 import RPi.GPIO as GPIO
-ENA = 26
-ENB = 0
-IN1 = 19
-IN2 = 13
+ENA = 19
+ENB = 18
+IN1 = 5
 time.sleep(2)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(ENA, GPIO.OUT)
 GPIO.setup(IN1, GPIO.OUT)
-GPIO.setup(IN2, GPIO.OUT)
 GPIO.setup(ENB, GPIO.OUT)
 
 motor_pwm = GPIO.PWM(ENA, 100)
@@ -43,24 +41,37 @@ def set_motor(direction, value):
     percent = value / 255.0 * 100 / mode
     print('Motor: ', direction , percent)
     if direction == FORWARD:
-        GPIO.output(IN1, GPIO.HIGH)
-        GPIO.output(IN2, GPIO.LOW)
+        GPIO.output(IN1, GPIO.LOW)
     elif direction == BACK:
-        GPIO.output(IN1, GPIO.LOW)
-        GPIO.output(IN2, GPIO.HIGH)
+        GPIO.output(IN1, GPIO.HIGH)
     elif direction == STOP:
-        GPIO.output(IN1, GPIO.LOW)
-        GPIO.output(IN2, GPIO.LOW)
+        perent = 0
     motor_pwm.ChangeDutyCycle(percent)
 
-def set_streering(value):
+def set_streering2(value):
+    print(value)
     if value <128:
         print('LEFT ', (128 - value)/128.0 * 100)
     elif value == 128:
         print('CENTER')
     elif value > 128:
         print('RIGHT ', (value -128 +1)/128.0 * 100 )
-    streer_pwm.ChangeDutyCycle(value/255.0*100)
+    print(13 - value/255.0*12)
+    streer_pwm.ChangeDutyCycle(13 - value/255.0*12)
+def set_streering(value):
+    delta = 0
+    print(value)
+    if value <128:
+        print('LEFT ', (128 - value)/128.0 * 100)
+        delta =  value/128*4.0 - 4
+    elif value == 128:
+        delta = 0
+        print('CENTER')
+    elif value > 128:
+        delta = (value-128)/128*4.0
+        print('RIGHT ', (value -128 +1)/128.0 * 100 )
+    print(delta)
+    streer_pwm.ChangeDutyCycle(7 + delta)
 def process_event(event):
     global current_gear
     global last_gear
